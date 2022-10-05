@@ -1,0 +1,103 @@
+---
+title: 'Task #4'
+author: "Blayne Chapman"
+date: "2022-10-05"
+output:
+  html_document:
+    keep_md: true
+    
+---
+### Task 4 using DPLYR
+
+## Load data and packages 
+```{r, results='hide'}
+#Packages
+library(tidyverse)
+
+
+#look at our iris data 
+str(iris)
+head(iris)
+tail(iris)
+```
+
+## Covert Iris data to a tible
+```{r}
+iris_data <- as_tibble(iris)
+head(iris_data)
+
+```
+
+## Arrange the iris data by Sepal.Length and display the first ten rows.
+```{r, echo=FALSE}
+arrange(iris_data, desc(Sepal.Length))
+head(iris_data)
+
+```
+
+## Select the Species and Petal.Width columns and put them into a new data set called testdat.
+```{r, echo=FALSE}
+testdat <- select(iris, Petal.Length, Species)
+head(testdat)
+tail(testdat)
+```
+
+## Create a new table called species_mean that has the mean for each variable for each Species.
+```{r, echo=FALSE}
+Group_species <- group_by(iris, Species)
+species_mean <- summarise( Group_species,
+  Sepal.Length = mean(Sepal.Length, na.rm = TRUE),
+  Sepal.Width = mean(Sepal.Width, na.rm = TRUE),
+  Petal.Length = mean(Petal.Length, na.rm = TRUE),
+  Petal.Width = mean(Petal.Width, na.rm = TRUE)
+)
+
+head(species_mean)
+```
+
+## Create a data frame called iris_min with only the observations with at least 3 for Sepal.Width and not 2.5 for Petal.Width.
+```{r, echo=FALSE}
+iris_min <- filter(iris, Sepal.Width >= 3, Petal.Width != 2.5)
+head(iris_min)
+
+```
+
+## Create a data frame called iris_size with a column Sepal.Size which is, small if Sepal.Length  5, medium if Sepal.Length  5 and  6.5, large if Sepal.Length  6.5.
+```{r, echo=FALSE}
+iris_size <- mutate(iris,
+                       Sepal.Size = case_when(Sepal.Length>=5 ~"small", between(Sepal.Length,5,6.5)~ "Medium",Sepal.Length<6.5~ "Large"))
+head(iris_size)
+
+
+```
+
+## Create a data frame called iris_rank which ranks all of the data by Petal.Length, where a ranking of 1 is the largest Petal.Length and order by ranking.
+```{r, echo=FALSE}
+iris.rank <- arrange(iris, desc(Petal.Length))
+head(iris.rank)
+tail(iris.rank)
+
+```
+
+## Read about the ?summarize_all() function and get a new table with the means and standard deviations for each species.
+```{r echo=FALSE}
+?summarise_all(iris, mean)
+
+#Now how create  table with the eand and standard deviations of the data set. 
+#why is not this working
+Avg_species <- iris
+
+Avg_species %>%
+  group_by(Species) %>%
+  summarize(mean(Sepal.Length), mean(Sepal.Width), mean(Petal.Length), mean(Petal.Width), sd(Sepal.Length),sd(Sepal.Width), sd(Petal.Length), sd(Petal.Width))
+
+```
+
+## Develop a novel Question that data can answer.
+# Does hunting have any affects on animal populations, that being negative or positive.
+Answer: I asked my friends aging from 18-28, the overal break down of what they all said there are hunting season to make sure certain animals are not hunted year round, also they said the total number of hunters has decreased due to food availability in grocery stores 
+
+According to online since 1990 there has a small but much noticeable drop in hunters this is notice by the hunting liscense sold in each state.
+According to one of the mentors who owns a guiding business and deals with tally up how many animals are harvested at his camp, 
+Hunter over the year can only affect animal populations by 5-10 percent he does mostly waterfowl which since there number are so high they are sub 5% for total population affected by hunters.
+
