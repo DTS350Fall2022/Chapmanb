@@ -1,0 +1,84 @@
+---
+title: 'Task #11'
+author: "Blayne Chapman"
+date: "2022-10-05"
+output:
+  html_document:
+   keep_md: true
+    
+    
+---
+
+### Task 11
+Tiddy up the data so you can create a visualization on how online movie ratings websites compare.
+
+```{r, results='hide'}
+#Load in our packages and our data
+library(tidyverse)
+
+#Temp file was having issues so I saved it to my computer then loaded it in. Make sure it was read in corretly.
+fandango <- read_csv("fandango_Score_comparison.csv")
+head(fandango)
+str(fandango)
+
+```
+
+## Strating to tiddy.
+Lets get only what we need from the data set. So we only need the rating from the 4 Websites.
+```{r, echo=FALSE}
+#Selecting only the 0-5 ratings from the websites 
+web_rating <- select(fandango, FILM, Fandango_Stars, RT_norm, Metacritic_norm, IMDB_norm)
+head(web_rating)
+```
+
+## Arrange and Pivoting
+We are pivoting our table so we can get our top 15 overall rated movies from the websites.
+```{r, echo=FALSE}
+#mutate then arrange the data 
+top<- mutate(web_rating, 
+                  Ranking = (Fandango_Stars)+(RT_norm)+(Metacritic_norm)+(IMDB_norm))
+
+top_rank <- top %>%
+  arrange(desc(Ranking)) %>%
+  slice(1:60)
+  
+
+#Now we Will pivot and make sure we still have our top 15 movies
+top_rank <-  top_rank %>%
+  pivot_longer(2:5, names_to = "Website")
+top_rank
+
+top_rank <- top_rank %>%
+  arrange(desc(Ranking)) %>%
+  slice(1:60)
+
+head(top_rank)
+```
+
+## Graphing the top rated movies 
+```{r, echo=FALSE}
+#Now that we have our top 15 movies we will graph them 
+top_movies <- ggplot(top_rank, aes(x = FILM, y = value))+
+  geom_col(color = "yellow", fill = "Yellow")+
+  geom_text(aes(label = value))+
+  facet_wrap('Website')+
+  labs(x = "Movie Title", title = "Top 15 rated movies compared to by website")+
+  coord_flip()
+
+top_movies
+```
+
+## Density Plot 
+The issues with the  Graph above is its hard to compare how each movie compared per websites. So we are going to use a density plot compareing the rating each website gave for those top 15 movies.This should allow us to see if a one websites rated them lower or higher than another. 
+```{r, echo=FALSE}
+#Density plot 
+star_density <- ggplot(top_rank, aes(x=value)) + 
+  geom_density(fill="dodgerblue")  +
+  facet_wrap('Website')+
+  labs(x="Movies rated Out of 5 Stars", title = "How Different Websites Ranked The Top 15 movies")
+star_density
+
+```
+
+## How they Compare?
+From this we can see that Rotten tomotoes on average had higher rating for there top 15 movies compared to the other three. The others were normally distributed for the most part having the ratings being more spread, from what I can see Metacritic seemed to be the most harsh or critical on there rating.
